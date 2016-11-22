@@ -10,9 +10,13 @@ public class Video {
     public final static int LUV_MAX = 159;
     Image[] imgArray;
     int imgArraySize;
-    public Video(){}
+    public Video(Image[] imgArray, int imgArraySize){
+        this.imgArray = imgArray;
+        this.imgArraySize = imgArraySize;
+    }
 
-    public int retrieveKeyFramesViaAverageHistogram(Image[] imgArray, int imgArraySize){
+    public int retrieveKeyFramesViaAverageHistogram(){
+
         double[] imgArrayAverage = new double[LUV_MAX];
         double[] imgArrayAverageNH = new double[LUV_MAX];
         double[] imgDistance = new double[imgArraySize];
