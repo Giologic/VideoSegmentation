@@ -8,88 +8,61 @@ import java.io.IOException;
 import java.util.*;
 
 public class ImageData {
-    static HashMap<String, double[]> nh;
-    static HashMap<String, double[][][]> lh;
-    static HashMap<String, int[][]> luv;
+    static HashMap<String, double[]> histUni;
+    static HashMap<String, double[]> histMJack;
+    static HashMap<String, double[]> hist777;
     
     static void init(){
-        nh = new HashMap<>();
-        lh = new HashMap<>();
-        luv = new HashMap<>();
+        histUni = new HashMap<>();
+        histMJack = new HashMap<>();
+        hist777 = new HashMap<>();
         try {
-            BufferedReader brNH = new BufferedReader(new FileReader("NormalizedHistos.txt"));
-            BufferedReader brLH = new BufferedReader(new FileReader("LocalizedHistos.txt"));
-            BufferedReader brLUV = new BufferedReader(new FileReader("luv.txt"));
+            BufferedReader brUni = new BufferedReader(new FileReader("UniHistos.txt"));
+            BufferedReader brMJack = new BufferedReader(new FileReader("MJackHistos.txt"));
+            BufferedReader br777 = new BufferedReader(new FileReader("777Histos.txt"));
             while(true){
-                String in = brNH.readLine();
+                String in = brUni.readLine();
                 if("".equals(in) || in==null) break;
-                String[] nhRaw = brNH.readLine().split(" ");
+                String[] nhRaw = brUni.readLine().split(" ");
                 double[] nhData = new double[Image.LUV_MAX];
                 for(int i=0; i<Image.LUV_MAX; i++){
                     nhData[i] = Double.parseDouble(nhRaw[i]);
                 }
-                nh.put(in, nhData);
+                histUni.put(in, nhData);
             }
             while(true){
-                String in = brLH.readLine();
+                String in = brMJack.readLine();
                 if("".equals(in) || in==null) break;
-                double[][][] curLH = new double[Image.BLOCKS_PER_ROW][Image.BLOCKS_PER_COL][];
-                for(int i=0; i<Image.BLOCKS_PER_ROW; i++)
-                    for(int j=0; j<Image.BLOCKS_PER_COL; j++){
-                        String[] lhRaw = brLH.readLine().split(" ");
-                        double[] lhData = new double[Image.LUV_MAX];
-                        for(int k=0; k<Image.LUV_MAX; k++){
-                            lhData[k] = Double.parseDouble(lhRaw[k]);
-                        }
-                        curLH[i][j] = lhData;
-                    }
-                lh.put(in, curLH);
-            }
-            while(true){
-                String in = brLUV.readLine();
-                if("".equals(in) || in==null) break;
-                String[] dim = brLUV.readLine().split(" ");
-                int nRows = Integer.parseInt(dim[0]);
-                int nCols =Integer.parseInt(dim[1]);
-                int[][] curLuv = new int[nRows][nCols];
-                for(int i=0; i<nRows; i++){
-                        String[] luvRaw = brLUV.readLine().split(" ");
-                        for(int j=0; j<nCols; j++) 
-                            curLuv[i][j] = Integer.parseInt(luvRaw[j]);
+                String[] nhRaw = brMJack.readLine().split(" ");
+                double[] nhData = new double[Image.LUV_MAX];
+                for(int i=0; i<Image.LUV_MAX; i++){
+                    nhData[i] = Double.parseDouble(nhRaw[i]);
                 }
-                luv.put(in, curLuv);
-                
+                histMJack.put(in, nhData);
+            }
+            while(true){
+                String in = br777.readLine();
+                if("".equals(in) || in==null) break;
+                String[] nhRaw = br777.readLine().split(" ");
+                double[] nhData = new double[Image.LUV_MAX];
+                for(int i=0; i<Image.LUV_MAX; i++){
+                    nhData[i] = Double.parseDouble(nhRaw[i]);
+                }
+                hist777.put(in, nhData);
             }
         } catch (FileNotFoundException ex) {} 
         catch (IOException ex) {}
         System.out.println("Initialization finished");
     }
     
-    static double[] getNH(String file){
-        return nh.get(file);
-    }
-    
-    static int[][] getLuv(String file){
-        return luv.get(file);
-    }
-    
-//    static double[] getCenter50(String file){
-//        return nh.get(file);
-//    }
-//    
-//    static double[] getNonCenter50(String file){
-//        return nh.get(file);
-//    }
-//    
-//    static double[] getCenter75(String file){
-//        return nh.get(file);
-//    }
-//    
-//    static double[] getNonCenter75(String file){
-//        return nh.get(file);
-//    }
-    
-    static double[][][] getLH(String file){
-        return lh.get(file);
+    static double[] getNH(String file, int video){
+        switch (video) {
+            case 1:
+                return histUni.get(file);
+            case 2:
+                return histMJack.get(file);
+            default:
+                return hist777.get(file);
+        }
     }
 }

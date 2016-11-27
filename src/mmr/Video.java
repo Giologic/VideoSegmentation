@@ -6,10 +6,10 @@ package mmr;
  * NOTE: NOT YET TESTED
  */
 public class Video {
-
     public final static int LUV_MAX = 159;
     Image[] imgArray;
     int imgArraySize;
+    
     public Video(Image[] imgArray, int imgArraySize){
         this.imgArray = imgArray;
         this.imgArraySize = imgArraySize;
@@ -63,7 +63,7 @@ public class Video {
         for(int i = 0 ; i < imgArraySize; i++) {
             int accumulator = 0;
             for(int j = 0 ; j < LUV_MAX; j++) {
-                accumulator += euclideanDistance(imgArray[i].nh[j], imgArrayAverage[j]);
+                accumulator += euclideanDistance(imgArray[i].hist[j], imgArrayAverage[j]);
             }
             imgDistanceNormalized[i] = accumulator;
         }

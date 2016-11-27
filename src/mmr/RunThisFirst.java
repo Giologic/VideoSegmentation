@@ -15,27 +15,21 @@ import java.io.IOException;
 */
 public class RunThisFirst {
     public static void main(String[] args) throws IOException {
-        File dir = new File("images/");
-        File[] directoryListing = dir.listFiles();
-        BufferedWriter bwNH = new BufferedWriter(new FileWriter("NormalizedHistos.txt"));
-        BufferedWriter bwLH = new BufferedWriter(new FileWriter("LocalizedHistos.txt"));
-        BufferedWriter bwLUV = new BufferedWriter(new FileWriter("luv.txt"));
-        
-        for (File child : directoryListing) {
-            System.out.println(child.getName());
-            if(!child.getName().endsWith("jpg")) continue;
-            Image i = new Image("images/"+child.getName());
-            String toWrite = child.getName();
-            bwNH.write(toWrite+"\r\n");
-            bwNH.write(i.getStringArr(i.nh)+"\r\n");
-            bwLH.write(toWrite+"\r\n");
-            bwLH.write(i.getStringLH()+"\r\n");
-            bwLUV.write(toWrite+"\r\n");
-            bwLUV.write(i.nRows+" "+i.nCols+"\r\n");
-            bwLUV.write(i.getStringLuv()+"\r\n");
+        String[] dirs = {"videos/uni/", "videos/mjack/", "videos/777/"};
+        String[] filenames = {"UniHistos.txt", "MJackHistos.txt", "777Histos.txt"};
+        for(int i=0; i<3; i++){
+            File dir = new File(dirs[i]);
+            File[] directoryListing = dir.listFiles();
+            BufferedWriter bw = new BufferedWriter(new FileWriter(filenames[i]));
+            for (File child : directoryListing) {
+                System.out.println((i+1)+" "+child.getName());
+                if(!child.getName().endsWith("jpg")) continue;
+                Image img = new Image(dirs[i]+child.getName());
+                String toWrite = child.getName();
+                bw.write(toWrite+"\r\n");
+                bw.write(img.getStringArr(img.hist)+"\r\n");
+            }
+            bw.close();
         }
-        bwNH.close();
-        bwLH.close();
-        bwLUV.close();
     }
 }
