@@ -21,6 +21,7 @@ public class RunThisFirst {
             File dir = new File(dirs[i]);
             File[] directoryListing = dir.listFiles();
             BufferedWriter bw = new BufferedWriter(new FileWriter(filenames[i]));
+            bw.write(directoryListing.length+"\r\n");
             for (File child : directoryListing) {
                 System.out.println((i+1)+" "+child.getName());
                 if(!child.getName().endsWith("jpg")) continue;
