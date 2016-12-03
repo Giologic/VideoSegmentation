@@ -122,7 +122,14 @@ public class Video {
                 }
             }
             
-                       
+            for (boolean b : gradualTransitionFrames){
+                if (b){
+                    while (b == false){
+                        b = true;
+                    }
+                }
+            }
+                     
             
                         
         }
