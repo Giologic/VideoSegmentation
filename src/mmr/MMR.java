@@ -1,14 +1,12 @@
 package mmr;
 
 import java.awt.GridLayout;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Scanner;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 public class MMR {
 
@@ -27,14 +25,16 @@ public class MMR {
         
         JFrame frame = new JFrame();
         frame.setTitle("Abrupt Transitions");
-        frame.getContentPane().setLayout(new GridLayout(v.shotBoundaries.size(), 1));
+        JPanel outerPanel = new JPanel();
+        outerPanel.setLayout(new GridLayout(v.shotBoundaries.size(), 1));
         for(int i=0; i<v.shotBoundaries.size(); i++){
             int shot = v.shotBoundaries.get(i);
             int shot2 = v.nextFrames.get(i);
             System.out.println(shot);
             JPanel p = new JPanel();
-            String q = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+"0"+shot+".jpg";
-            String q2 = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+"0"+shot2+".jpg";
+            String buff = shot<10 ? "000" : shot<100 ? "00" : shot < 1000 ? "0" : "";
+            String q = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot+".jpg";
+            String q2 = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot2+".jpg";
             JLabel l1 = new JLabel(new ImageIcon(q));
             l1.setText(q);
             l1.setHorizontalTextPosition(JLabel.CENTER);
@@ -45,8 +45,11 @@ public class MMR {
             l2.setHorizontalTextPosition(JLabel.CENTER);
             l2.setVerticalTextPosition(JLabel.BOTTOM);
             p.add(l2);
-            frame.add(p);
+            outerPanel.add(p);
         }
+        JScrollPane sp = new JScrollPane(outerPanel);
+        sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        frame.add(sp);
         frame.setSize(400, 350);
         frame.setResizable(false);
         frame.setVisible(true);
