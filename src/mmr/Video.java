@@ -67,7 +67,7 @@ public class Video {
         // original threshold na cinode ni Gio (Marc?) dati
         tb = sdMean + alpha*sdSD;
         // "Usually Ts ~ 8- 10 and Tb = µ + aδ where a = 5 or 6" (PPT)
-        ts = 9;
+        ts = tb * 0.33;
         
         double totalDiffGT = 0;
         // Problem: there could be a minor drop in SDi which will not allow 
