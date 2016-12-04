@@ -118,11 +118,15 @@ public class Video {
                           
         }
         
-        for (boolean b : gtFrames){
-            if (b){
-                while (b == false){
-                    b = true;
+        for (int i = 0; i < gtFrames.length; i++){
+            if (gtFrames[i]){
+                int j = i;
+                if ((j+1) < gtFrames.length - 1) j++; 
+                while (gtFrames[j] == false){
+                    gtFrames[j] = true;
+                    if ((j+1) < gtFrames.length - 1) j++;                    
                 }
+                i = j;
             }
         }
         
