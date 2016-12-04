@@ -14,17 +14,20 @@ public class Video {
     double[] avgHist = new double[LUV_MAX];
     double sdMean = 0;
     double sdSD = 0;
-    double alpha = 1;
+    double alpha;
     double thresh;
     ArrayList<Integer> shotBoundaries;
+    ArrayList<Integer> nextFrames;
     ArrayList<Integer> keyframes;
     
-    public Video(double[][] hist){
+    public Video(double[][] hist, double alpha){
         this.hist = hist;
+        this.alpha = alpha;
         sd = new double[hist.length-1];
         sdMean = 0;
         sdSD = 0;
         shotBoundaries = new ArrayList<>();
+        nextFrames = new ArrayList<>();
         keyframes = new ArrayList<>();
     }
 
@@ -41,7 +44,10 @@ public class Video {
         sdSD = Math.sqrt(sdSD/sd.length);
         thresh = sdMean + alpha*sdSD;
         for(int i=0; i<sd.length; i++)
-            if(sd[i]>thresh) shotBoundaries.add(i); // shot boundary between i and i+1
+            if(sd[i]>thresh){ // shot boundary between i and i+1
+                shotBoundaries.add(i);
+                nextFrames.add(i+1);
+            } 
         avgHistogram();
     }
 
