@@ -22,6 +22,7 @@ public class MMR {
         int index = sc.nextInt();
         Video v = new Video(VideoData.getHist(index), alpha);
         v.twinComparison();
+        System.out.println(v.tb);
         
         JFrame frame = new JFrame();
         frame.setTitle("Abrupt Transitions");

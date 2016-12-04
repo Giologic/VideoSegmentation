@@ -53,7 +53,6 @@ public class Video {
 //    }
     
     public void twinComparison(){
-        //COMPUTE THE DISTANCE BETWEEN EVERY TWO FRAMES 
         for(int i = 1; i < hist.length; i++) {
             for(int j=0; j<LUV_MAX; j++){
                 sd[i-1]+=Math.abs(hist[i-1][j]-hist[i][j]);
@@ -64,9 +63,7 @@ public class Video {
         for(int i=0; i<sd.length; i++) sdSD+=Math.pow(sd[i]-sdMean, 2);
         sdSD = Math.sqrt(sdSD/sd.length);
         
-        // original threshold na cinode ni Gio (Marc?) dati
         tb = sdMean + alpha*sdSD;
-        // "Usually Ts ~ 8- 10 and Tb = µ + aδ where a = 5 or 6" (PPT)
         ts = 9;
         
         double totalDiffGT = 0;
@@ -77,7 +74,6 @@ public class Video {
         int currDroppedFrames = 0;
         
         for(int i=0; i<sd.length; i++){
-            // mark abrupt transition sequences as shot boundaries
             if(sd[i]>tb) {
                 shotBoundaries.add(i); // shot boundary between i and i+1
                 nextFrames.add(i+1);
