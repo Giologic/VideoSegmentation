@@ -64,7 +64,7 @@ public class Video {
         sdSD = Math.sqrt(sdSD/sd.length);
         
         tb = sdMean + alpha*sdSD;
-        ts = 9;
+        ts = tb * 0.33;
         
         double totalDiffGT = 0;
         // Problem: there could be a minor drop in SDi which will not allow 
@@ -96,6 +96,7 @@ public class Video {
                     if (totalDiffGT > ts){
                         gtFrames[pStart] = true;
                         gtFrames[pEnd] = true;
+                        shotBoundaries.add(pStart);
                     }
                 } else if (!hasStartGT && hasEndGT){
                     hasStartGT = false;
@@ -114,15 +115,17 @@ public class Video {
                     totalDiffGT = 0;
                 }
             }
-            
-            for (boolean b : gtFrames){
-                if (b){
-                    while (b == false){
-                        b = true;
-                    }
-                }
-            }               
+                          
         }
+        
+        for (boolean b : gtFrames){
+            if (b){
+                while (b == false){
+                    b = true;
+                }
+            }
+        }
+        
         avgHistogram();
     }
 
