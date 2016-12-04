@@ -100,6 +100,7 @@ public class Video {
                     if (totalDiffGT > ts){
                         gtFrames[pStart] = true;
                         gtFrames[pEnd] = true;
+                        shotBoundaries.add(pStart);
                     }
                 } else if (!hasStartGT && hasEndGT){
                     hasStartGT = false;
@@ -118,15 +119,17 @@ public class Video {
                     totalDiffGT = 0;
                 }
             }
-            
-            for (boolean b : gtFrames){
-                if (b){
-                    while (b == false){
-                        b = true;
-                    }
-                }
-            }               
+                          
         }
+        
+        for (boolean b : gtFrames){
+            if (b){
+                while (b == false){
+                    b = true;
+                }
+            }
+        }
+        
         avgHistogram();
     }
 
