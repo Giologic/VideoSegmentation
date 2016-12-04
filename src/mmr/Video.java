@@ -15,11 +15,11 @@ public class Video {
     double sdMean = 0;
     double sdSD = 0;
     double alpha;
-    double threshCamBreaks, threshSpecEffects;
+    double tb, ts;
     ArrayList<Integer> shotBoundaries;
     ArrayList<Integer> nextFrames;
     ArrayList<Integer> keyframes;
-    boolean[] gradualTransitionFrames;
+    boolean[] gtFrames;
     
     public Video(double[][] hist, double alpha){
         this.hist = hist;
@@ -30,7 +30,7 @@ public class Video {
         shotBoundaries = new ArrayList<>();
         nextFrames = new ArrayList<>();
         keyframes = new ArrayList<>();
-        gradualTransitionFrames = new boolean[sd.length];
+        gtFrames = new boolean[sd.length];
     }
 
 // back up lang to; it's the code before i started meddling with it :))
@@ -65,11 +65,11 @@ public class Video {
         sdSD = Math.sqrt(sdSD/sd.length);
         
         // original threshold na cinode ni Gio (Marc?) dati
-        threshCamBreaks = sdMean + alpha*sdSD;
+        tb = sdMean + alpha*sdSD;
         // "Usually Ts ~ 8- 10 and Tb = µ + aδ where a = 5 or 6" (PPT)
-        threshSpecEffects = 9;
+        ts = 9;
         
-        double accumulatedDifferenceGradualTransition = 0;
+        double totalDiffGT = 0;
         // Problem: there could be a minor drop in SDi which will not allow 
         // proper detection of gradual transitions. 
         // This can be fixed by giving a tolerance of 2-3 frames.
@@ -78,52 +78,48 @@ public class Video {
         
         for(int i=0; i<sd.length; i++){
             // mark abrupt transition sequences as shot boundaries
-            if(sd[i]>threshCamBreaks) {
+            if(sd[i]>tb) {
                 shotBoundaries.add(i); // shot boundary between i and i+1
                 nextFrames.add(i+1);
             }
             
             // mark potential gradual transition sequences
-            boolean theresCurrentlyAStartGradualTransitionFrame = false;
-            boolean theresCurrentlyAnEndGradualTransitionFrame = false;
-            int potentialStart = 0, potentialEnd = 0;
+            boolean hasStartGT = false;
+            boolean hasEndGT = false;
+            int pStart = 0, pEnd = 0;
             
-            if (sd[i]>threshSpecEffects) {
-                if (theresCurrentlyAStartGradualTransitionFrame == false &&
-                    theresCurrentlyAnEndGradualTransitionFrame == false){
-                    theresCurrentlyAStartGradualTransitionFrame = true;
-                    potentialStart = i;
-                    accumulatedDifferenceGradualTransition += sd[i];
-                } else if (theresCurrentlyAStartGradualTransitionFrame == true &&
-                        theresCurrentlyAnEndGradualTransitionFrame == false){
-                    theresCurrentlyAnEndGradualTransitionFrame = true;
-                    potentialEnd = i;
-                    accumulatedDifferenceGradualTransition += sd[i];
-                    if (accumulatedDifferenceGradualTransition > threshSpecEffects){
-                        gradualTransitionFrames[potentialStart] = true;
-                        gradualTransitionFrames[potentialEnd] = true;
+            if (sd[i]>ts) {
+                if (!hasStartGT && !hasEndGT){
+                    hasStartGT = true;
+                    pStart = i;
+                    totalDiffGT += sd[i];
+                } else if (hasStartGT && !hasEndGT){
+                    hasEndGT = true;
+                    pEnd = i;
+                    totalDiffGT += sd[i];
+                    if (totalDiffGT > ts){
+                        gtFrames[pStart] = true;
+                        gtFrames[pEnd] = true;
                     }
-                } else if (theresCurrentlyAStartGradualTransitionFrame == false &&
-                        theresCurrentlyAnEndGradualTransitionFrame == true){
-                    theresCurrentlyAStartGradualTransitionFrame = false;
-                    theresCurrentlyAnEndGradualTransitionFrame = false;
-                    potentialStart = 0;
-                    potentialEnd = 0;
-                    accumulatedDifferenceGradualTransition = 0;
+                } else if (!hasStartGT && hasEndGT){
+                    hasStartGT = false;
+                    hasEndGT = false;
+                    pStart = 0;
+                    pEnd = 0;
+                    totalDiffGT = 0;
                 }
-            } else if (sd[i]<threshSpecEffects && 
-                    theresCurrentlyAStartGradualTransitionFrame){
+            } else if (sd[i]<ts && hasStartGT){
                 currDroppedFrames++;
                 if (currDroppedFrames > allowedDroppedFrames){
-                    theresCurrentlyAStartGradualTransitionFrame = false;
-                    theresCurrentlyAnEndGradualTransitionFrame = false;
-                    potentialStart = 0;
-                    potentialEnd = 0;
-                    accumulatedDifferenceGradualTransition = 0;
+                    hasStartGT = false;
+                    hasEndGT = false;
+                    pStart = 0;
+                    pEnd = 0;
+                    totalDiffGT = 0;
                 }
             }
             
-            for (boolean b : gradualTransitionFrames){
+            for (boolean b : gtFrames){
                 if (b){
                     while (b == false){
                         b = true;
