@@ -11,25 +11,32 @@ public class Video {
     public final static int LUV_MAX = 159;
     double[][] hist;
     double[] sd;
-    double[] avgHist = new double[LUV_MAX];
     double sdMean = 0;
     double sdSD = 0;
     double alpha;
-    double tb, ts;
+    double tb, ts, tsCoeff;
     ArrayList<Integer> shotBoundaries;
     ArrayList<Integer> nextFrames;
-    ArrayList<Integer> keyframes;
+    ArrayList<Integer> abruptKeyframes;
     boolean[] gtFrames;
+    int totalGT = 0;
+    ArrayList<Integer> gtStart;
+    ArrayList<Integer> gtEnd;
+    ArrayList<Integer> gradualKeyframes;
     
-    public Video(double[][] hist, double alpha){
+    public Video(double[][] hist, double alpha, double ts){
         this.hist = hist;
         this.alpha = alpha;
+        this.tsCoeff = ts;
         sd = new double[hist.length-1];
         sdMean = 0;
         sdSD = 0;
         shotBoundaries = new ArrayList<>();
         nextFrames = new ArrayList<>();
-        keyframes = new ArrayList<>();
+        abruptKeyframes = new ArrayList<>();
+        gtStart = new ArrayList<>();
+        gtEnd = new ArrayList<>();
+        gradualKeyframes = new ArrayList<>();
         gtFrames = new boolean[sd.length];
     }
 
@@ -64,7 +71,7 @@ public class Video {
         sdSD = Math.sqrt(sdSD/sd.length);
         
         tb = sdMean + alpha*sdSD;
-        ts = tb * 0.33;
+        ts = tb * tsCoeff;
         
         double totalDiffGT = 0;
         // Problem: there could be a minor drop in SDi which will not allow 
@@ -78,7 +85,6 @@ public class Video {
                 shotBoundaries.add(i); // shot boundary between i and i+1
                 nextFrames.add(i+1);
             }
-            
             // mark potential gradual transition sequences
             boolean hasStartGT = false;
             boolean hasEndGT = false;
@@ -96,7 +102,7 @@ public class Video {
                     if (totalDiffGT > ts){
                         gtFrames[pStart] = true;
                         gtFrames[pEnd] = true;
-                        shotBoundaries.add(pStart);
+//                        shotBoundaries.add(pStart);
                     }
                 } else if (!hasStartGT && hasEndGT){
                     hasStartGT = false;
@@ -118,11 +124,22 @@ public class Video {
                           
         }
         
+        boolean isStart = true;
+        System.out.println(countTrueGTFrames());
+        for(int i=0; i<gtFrames.length; i++){
+            boolean b = gtFrames[i];
+            if(b){
+                if(isStart) gtStart.add(i);
+                else gtEnd.add(i);
+                isStart = !isStart;
+            }
+        }
+        
         for (int i = 0; i < gtFrames.length; i++){
             if (gtFrames[i]){
                 int j = i;
                 if ((j+1) < gtFrames.length - 1) j++; 
-                while (gtFrames[j] == false){
+                while (!gtFrames[j]){
                     gtFrames[j] = true;
                     if ((j+1) < gtFrames.length - 1) j++;                    
                 }
@@ -134,15 +151,17 @@ public class Video {
     }
 
     private void avgHistogram(){
-        for (double[] img: hist) 
-            for (int j = 0; j < LUV_MAX; j++) avgHist[j] += img[j];
-        //GET THE AVERAGE
-        for(int i = 0 ; i < LUV_MAX; i++) avgHist[i] /= hist.length;
-        
+        shotBoundaries.add(sd.length);
         int shotStart = 0;
         for(Integer shotEnd: shotBoundaries){
             int minDist = Integer.MAX_VALUE;
             int keyframe = shotStart;
+            double[] avgHist = new double[LUV_MAX];
+            for(int i=shotStart; i<=shotEnd; i++){
+                double[] img = hist[i];
+                for (int j = 0; j < LUV_MAX; j++) avgHist[j] += img[j];
+            }
+            for(int i = 0 ; i < LUV_MAX; i++) avgHist[i] /= (shotEnd-shotStart);
             for(int i=shotStart; i<=shotEnd; i++){
                 int dist = 0;
                 for(int j=0; j<LUV_MAX; j++) dist += Math.abs(hist[i][j]-avgHist[j]);
@@ -151,9 +170,38 @@ public class Video {
                     keyframe = i;
                 }
             }
-            keyframes.add(keyframe);
+            abruptKeyframes.add(keyframe);
             shotStart = shotEnd+1;
         }
+        shotBoundaries.remove(shotBoundaries.size()-1);
         
+        shotStart = 0;
+        for(int index=0; index<gtStart.size(); index++){
+            int shotEnd = gtStart.get(index)-1;
+            int minDist = Integer.MAX_VALUE;
+            int keyframe = shotStart;
+            double[] avgHist = new double[LUV_MAX];
+            for(int i=shotStart; i<=shotEnd; i++){
+                double[] img = hist[i];
+                for (int j = 0; j < LUV_MAX; j++) avgHist[j] += img[j];
+            }
+            for(int i = 0 ; i < LUV_MAX; i++) avgHist[i] /= (shotEnd-shotStart);
+            for(int i=shotStart; i<=shotEnd; i++){
+                int dist = 0;
+                for(int j=0; j<LUV_MAX; j++) dist += Math.abs(hist[i][j]-avgHist[j]);
+                if(dist<minDist){
+                    minDist = dist;
+                    keyframe = i;
+                }
+            }
+            gradualKeyframes.add(keyframe);
+            shotStart = gtEnd.get(index)+1;
+        }
+    }
+
+    private int countTrueGTFrames() {
+        int total = 0;
+        for(boolean b: gtFrames) total += b ? 1 : 0;
+        return total;
     }
 }
