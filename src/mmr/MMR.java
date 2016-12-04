@@ -23,7 +23,6 @@ public class MMR {
         System.out.print("Enter video: ");
         int index = sc.nextInt();
         Video v = new Video(VideoData.getHist(index), alpha, tsCoeff);
-        String[] filenames = VideoData.getFilenames(index);
         v.twinComparison();
         System.out.println(v.tb);
         
@@ -37,6 +36,7 @@ public class MMR {
             JPanel p = new JPanel();
             String buff = shot<10 ? "000" : shot<100 ? "00" : shot<1000 ? "0" : "";
             String q = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot+".jpg";
+            buff = shot2<10 ? "000" : shot2<100 ? "00" : shot2<1000 ? "0" : "";
             String q2 = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot2+".jpg";
             JLabel l1 = new JLabel(new ImageIcon(q));
             l1.setText(q);
@@ -92,6 +92,7 @@ public class MMR {
             JPanel p = new JPanel();
             String buff = shot<10 ? "000" : shot<100 ? "00" : shot<1000 ? "0" : "";
             String q = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot+".jpg";
+            buff = shot2<10 ? "000" : shot2<100 ? "00" : shot2<1000 ? "0" : "";
             String q2 = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+shot2+".jpg";
             JLabel l1 = new JLabel(new ImageIcon(q));
             l1.setText(q);
@@ -112,5 +113,29 @@ public class MMR {
         gradual.setResizable(false);
         gradual.setVisible(true);
         gradual.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        JFrame gradualKF = new JFrame();
+        gradualKF.setTitle("Gradual Transitions Keyframes");
+        outerPanel = new JPanel();
+        outerPanel.setLayout(new GridLayout(v.gradualKeyframes.size(), 1));
+        for(int i=0; i<v.gradualKeyframes.size(); i++){
+            int keyframe = v.gradualKeyframes.get(i);
+            JPanel p = new JPanel();
+            String buff = keyframe<10 ? "000" : keyframe<100 ? "00" : keyframe<1000 ? "0" : "";
+            String q = "videos/"+(index==1 ? "uni/" : index==2 ? "mjack/" : "777/")+buff+keyframe+".jpg";
+            JLabel l1 = new JLabel(new ImageIcon(q));
+            l1.setText(q);
+            l1.setHorizontalTextPosition(JLabel.CENTER);
+            l1.setVerticalTextPosition(JLabel.BOTTOM);
+            p.add(l1);
+            outerPanel.add(p);
+        }
+        sp = new JScrollPane(outerPanel);
+        sp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        gradualKF.add(sp);
+        gradualKF.setSize(400, 350);
+        gradualKF.setResizable(false);
+        gradualKF.setVisible(true);
+        gradualKF.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

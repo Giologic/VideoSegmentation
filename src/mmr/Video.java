@@ -14,7 +14,7 @@ public class Video {
     double sdMean = 0;
     double sdSD = 0;
     double alpha;
-    double tb, ts, tsCoeff;
+    double tb, ts, tsCoeff, tbGradual, tbCoeff=2.5;
     ArrayList<Integer> shotBoundaries;
     ArrayList<Integer> nextFrames;
     ArrayList<Integer> abruptKeyframes;
@@ -39,25 +39,6 @@ public class Video {
         gradualKeyframes = new ArrayList<>();
         gtFrames = new boolean[sd.length];
     }
-
-// back up lang to; it's the code before i started meddling with it :))
-    
-//    public void twinComparison(){
-//        //COMPUTE THE DISTANCE BETWEEN EVERY TWO FRAMES 
-//        for(int i = 1; i < hist.length; i++) {
-//            for(int j=0; j<LUV_MAX; j++){
-//                sd[i-1]+=Math.abs(hist[i-1][j]-hist[i][j]);
-//            }
-//            sdMean += sd[i-1];
-//        }
-//        sdMean/=sd.length;
-//        for(int i=0; i<sd.length; i++) sdSD+=Math.pow(sd[i]-sdMean, 2);
-//        sdSD = Math.sqrt(sdSD/sd.length);
-//        thresh = sdMean + alpha*sdSD;
-//        for(int i=0; i<sd.length; i++)
-//            if(sd[i]>thresh) shotBoundaries.add(i); // shot boundary between i and i+1
-//        avgHistogram();
-//    }
     
     public void twinComparison(){
         for(int i = 1; i < hist.length; i++) {
@@ -72,44 +53,43 @@ public class Video {
         
         tb = sdMean + alpha*sdSD;
         ts = tb * tsCoeff;
+        tbGradual = tb*tbCoeff;
         
         double totalDiffGT = 0;
-        // Problem: there could be a minor drop in SDi which will not allow 
-        // proper detection of gradual transitions. 
-        // This can be fixed by giving a tolerance of 2-3 frames.
         int allowedDroppedFrames = 3; 
         int currDroppedFrames = 0;
-        
+        System.out.println(ts);
+        boolean hasStartGT = false;
+        boolean hasEndGT = false;
+        int pStart = 0, pEnd = 0;
+        System.out.println(ts+" "+tb);
         for(int i=0; i<sd.length; i++){
             if(sd[i]>tb) {
                 shotBoundaries.add(i); // shot boundary between i and i+1
                 nextFrames.add(i+1);
             }
-            // mark potential gradual transition sequences
-            boolean hasStartGT = false;
-            boolean hasEndGT = false;
-            int pStart = 0, pEnd = 0;
-            
-            if (sd[i]>ts) {
+            if (sd[i]>ts && sd[i]<tb) {
                 if (!hasStartGT && !hasEndGT){
                     hasStartGT = true;
                     pStart = i;
                     totalDiffGT += sd[i];
+                    System.out.println(sd[i]+" hii "+i);
                 } else if (hasStartGT && !hasEndGT){
-                    hasEndGT = true;
-                    pEnd = i;
+                    System.out.println(sd[i]+" i "+i);
+                    currDroppedFrames = 0;
                     totalDiffGT += sd[i];
-                    if (totalDiffGT > ts){
+                    if (totalDiffGT > tbGradual){
+                        System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
+                        pEnd = i;
                         gtFrames[pStart] = true;
                         gtFrames[pEnd] = true;
-//                        shotBoundaries.add(pStart);
+                        gtStart.add(pStart);
+                        gtEnd.add(pEnd);
+                        hasStartGT = hasEndGT = false;
+                        pStart = 0;
+                        pEnd = 0;
+                        totalDiffGT = 0;
                     }
-                } else if (!hasStartGT && hasEndGT){
-                    hasStartGT = false;
-                    hasEndGT = false;
-                    pStart = 0;
-                    pEnd = 0;
-                    totalDiffGT = 0;
                 }
             } else if (sd[i]<ts && hasStartGT){
                 currDroppedFrames++;
@@ -119,22 +99,27 @@ public class Video {
                     pStart = 0;
                     pEnd = 0;
                     totalDiffGT = 0;
+                    currDroppedFrames = 0;
+                } else {
+                    totalDiffGT+=sd[i];
+                    System.out.println(+sd[i]+" h "+i);
                 }
             }
-                          
+//            else 
+//                System.out.println(sd[i]+" hiii "+i);              
         }
         
-        boolean isStart = true;
-        System.out.println(countTrueGTFrames());
-        for(int i=0; i<gtFrames.length; i++){
-            boolean b = gtFrames[i];
-            if(b){
-                if(isStart) gtStart.add(i);
-                else gtEnd.add(i);
-                isStart = !isStart;
-            }
-        }
-        
+//        boolean isStart = true;
+//        System.out.println(countTrueGTFrames());
+//        for(int i=0; i<gtFrames.length; i++){
+//            boolean b = gtFrames[i];
+//            if(b){
+//                if(isStart) gtStart.add(i);
+//                else gtEnd.add(i);
+//                isStart = !isStart;
+//            }
+//        }
+//        
         for (int i = 0; i < gtFrames.length; i++){
             if (gtFrames[i]){
                 int j = i;
@@ -176,6 +161,7 @@ public class Video {
         shotBoundaries.remove(shotBoundaries.size()-1);
         
         shotStart = 0;
+        gtStart.add(sd.length);
         for(int index=0; index<gtStart.size(); index++){
             int shotEnd = gtStart.get(index)-1;
             int minDist = Integer.MAX_VALUE;
@@ -195,8 +181,10 @@ public class Video {
                 }
             }
             gradualKeyframes.add(keyframe);
+            if(index!=gtStart.size()-1)
             shotStart = gtEnd.get(index)+1;
         }
+        gtStart.remove(gtStart.size()-1);
     }
 
     private int countTrueGTFrames() {
