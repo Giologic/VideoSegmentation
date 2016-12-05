@@ -73,9 +73,9 @@ public class Video {
                     hasStartGT = true;
                     pStart = i;
                     totalDiffGT += sd[i];
-                    System.out.println(sd[i]+" hii "+i);
+                    System.out.println(sd[i]+" starting potential GT "+i);
                 } else if (hasStartGT && !hasEndGT){
-                    System.out.println(sd[i]+" i "+i);
+                    System.out.println(sd[i]+" adding "+i);
                     currDroppedFrames = 0;
                     totalDiffGT += sd[i];
                 }
@@ -83,7 +83,7 @@ public class Video {
                 currDroppedFrames++;
                 totalDiffGT += sd[i];
                 if (totalDiffGT > tbGradual && currDroppedFrames > allowedDroppedFrames){
-                    System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT+" "+i);
+                    System.out.println("------------- Found GT "+totalDiffGT+" "+i);
                     pEnd = i;
                     gtFrames[pStart] = true;
                     gtFrames[pEnd] = true;
@@ -102,7 +102,7 @@ public class Video {
                     currDroppedFrames = 0;
                 } else {
                     totalDiffGT+=sd[i];
-                    System.out.println(+sd[i]+" h "+i);
+                    System.out.println(+sd[i]+" almost dropped "+i);
                 }
             } else {
                 hasStartGT = false;
