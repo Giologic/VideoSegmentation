@@ -78,22 +78,34 @@ public class Video {
                     System.out.println(sd[i]+" i "+i);
                     currDroppedFrames = 0;
                     totalDiffGT += sd[i];
-                    if (totalDiffGT > tbGradual){
-                        System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
-                        pEnd = i;
-                        gtFrames[pStart] = true;
-                        gtFrames[pEnd] = true;
-                        gtStart.add(pStart);
-                        gtEnd.add(pEnd);
-                        hasStartGT = hasEndGT = false;
-                        pStart = 0;
-                        pEnd = 0;
-                        totalDiffGT = 0;
-                    }
+//                    if (totalDiffGT > tbGradual){
+//                        System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
+//                        pEnd = i;
+//                        gtFrames[pStart] = true;
+//                        gtFrames[pEnd] = true;
+//                        gtStart.add(pStart);
+//                        gtEnd.add(pEnd);
+//                        hasStartGT = hasEndGT = false;
+//                        pStart = 0;
+//                        pEnd = 0;
+//                        totalDiffGT = 0;
+//                    }
                 }
             } else if (sd[i]<ts && hasStartGT){
                 currDroppedFrames++;
-                if (currDroppedFrames > allowedDroppedFrames){
+                totalDiffGT += sd[i];
+                if (totalDiffGT > tbGradual){
+                    System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
+                    pEnd = i;
+                    gtFrames[pStart] = true;
+                    gtFrames[pEnd] = true;
+                    gtStart.add(pStart);
+                    gtEnd.add(pEnd);
+                    hasStartGT = hasEndGT = false;
+                    pStart = 0;
+                    pEnd = 0;
+                    totalDiffGT = 0;
+                }else if (currDroppedFrames > allowedDroppedFrames){
                     hasStartGT = false;
                     hasEndGT = false;
                     pStart = 0;
@@ -101,25 +113,12 @@ public class Video {
                     totalDiffGT = 0;
                     currDroppedFrames = 0;
                 } else {
+                    
                     totalDiffGT+=sd[i];
                     System.out.println(+sd[i]+" h "+i);
                 }
-            }
-//            else 
-//                System.out.println(sd[i]+" hiii "+i);              
+            }          
         }
-        
-//        boolean isStart = true;
-//        System.out.println(countTrueGTFrames());
-//        for(int i=0; i<gtFrames.length; i++){
-//            boolean b = gtFrames[i];
-//            if(b){
-//                if(isStart) gtStart.add(i);
-//                else gtEnd.add(i);
-//                isStart = !isStart;
-//            }
-//        }
-//        
         for (int i = 0; i < gtFrames.length; i++){
             if (gtFrames[i]){
                 int j = i;
