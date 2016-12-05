@@ -14,7 +14,7 @@ public class Video {
     double sdMean = 0;
     double sdSD = 0;
     double alpha;
-    double tb, ts, tsCoeff, tbGradual, tbCoeff=2.5;
+    double tb, ts, tsCoeff, tbGradual, tbCoeff=1.3;
     ArrayList<Integer> shotBoundaries;
     ArrayList<Integer> nextFrames;
     ArrayList<Integer> abruptKeyframes;
@@ -78,24 +78,12 @@ public class Video {
                     System.out.println(sd[i]+" i "+i);
                     currDroppedFrames = 0;
                     totalDiffGT += sd[i];
-//                    if (totalDiffGT > tbGradual){
-//                        System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
-//                        pEnd = i;
-//                        gtFrames[pStart] = true;
-//                        gtFrames[pEnd] = true;
-//                        gtStart.add(pStart);
-//                        gtEnd.add(pEnd);
-//                        hasStartGT = hasEndGT = false;
-//                        pStart = 0;
-//                        pEnd = 0;
-//                        totalDiffGT = 0;
-//                    }
                 }
             } else if (sd[i]<ts && hasStartGT){
                 currDroppedFrames++;
                 totalDiffGT += sd[i];
-                if (totalDiffGT > tbGradual){
-                    System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT);
+                if (totalDiffGT > tbGradual && currDroppedFrames > allowedDroppedFrames){
+                    System.out.println("hiiiiiiiiiiiiiiiiiiiii "+totalDiffGT+" "+i);
                     pEnd = i;
                     gtFrames[pStart] = true;
                     gtFrames[pEnd] = true;
@@ -113,11 +101,17 @@ public class Video {
                     totalDiffGT = 0;
                     currDroppedFrames = 0;
                 } else {
-                    
                     totalDiffGT+=sd[i];
                     System.out.println(+sd[i]+" h "+i);
                 }
-            }          
+            } else {
+                hasStartGT = false;
+                hasEndGT = false;
+                pStart = 0;
+                pEnd = 0;
+                totalDiffGT = 0;
+                currDroppedFrames = 0;
+            }    
         }
         for (int i = 0; i < gtFrames.length; i++){
             if (gtFrames[i]){
