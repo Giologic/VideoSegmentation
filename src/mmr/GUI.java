@@ -1,21 +1,12 @@
 package mmr;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
-import javax.swing.SwingConstants;
 import java.awt.Font;
 
 public class GUI extends JFrame{
@@ -30,10 +21,10 @@ public class GUI extends JFrame{
 		
 		getContentPane().setLayout(null);
 		this.setVisible(true);
-		this.setSize(690, 590);
+		this.setSize(900, 590);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		JPanel panelInput = new JPanel();
-		panelInput.setBounds(10, 11, 655, 63);
+		panelInput.setBounds(10, 11, 950, 63);
 		panelInput.setLayout(null);
 		getContentPane().add(panelInput);
 		
@@ -80,9 +71,13 @@ public class GUI extends JFrame{
                         index = cbVid.getSelectedIndex() + 1;
                         v = new Video(VideoData.getHist(index), alpha, t);
                         v.twinComparison();
-                        if (alpha > 1 || alpha < 0 || t > 1 || t < 0) {
+                        if (t > 1 || t < 0) {
                             flag = 1;
-                            lblStatus.setText("Alpha/ts-coefficient value should be from 0-1 only.");
+                            lblStatus.setText("ts-coefficient value should be from 0-1 only.");
+                        }
+                        if (alpha < 1) {
+                            flag = 1;
+                            lblStatus.setText("alpha coefficient value should be at least 1");
                         }
                     } catch (Exception a) {
                         flag = 1;
@@ -93,9 +88,9 @@ public class GUI extends JFrame{
                     if (flag == 0) {
                     	lblStatus.setText("");
                     	JPanel outerPanel = new JPanel();
-                    	outerPanel.setLayout(new FlowLayout());
+                    	outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
                         outerPanel.setLocation(1, 1);
-                        outerPanel.setSize(800, 1500);
+                        outerPanel.setSize(1250, 1500);
                          //outerPanel.setLayout(new GridLayout(v.shotBoundaries.size(), 1));
                          for(int i=0; i<v.shotBoundaries.size(); i++){
                              int shot = v.shotBoundaries.get(i);
@@ -121,10 +116,10 @@ public class GUI extends JFrame{
                          outerPanel.setVisible(true);
                          scrollPane1.setViewportView(outerPanel);
                          scrollPane1.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                         scrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//                         scrollPane1.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                          
                          outerPanel = new JPanel();
-                         outerPanel.setLayout(new FlowLayout());
+                         outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
                          for(int i=0; i<v.abruptKeyframes.size(); i++){
                              int keyframe = v.abruptKeyframes.get(i);
                              JPanel p = new JPanel();
@@ -140,10 +135,10 @@ public class GUI extends JFrame{
                          
                          scrollPane2.setViewportView(outerPanel);
                          scrollPane2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                         scrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//                         scrollPane2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                          
                          outerPanel = new JPanel();
-                         outerPanel.setLayout(new FlowLayout());
+                         outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
                          for(int i=0; i<v.gtStart.size(); i++){
                              int shot = v.gtStart.get(i);
                              int shot2 = v.gtEnd.get(i);
@@ -167,10 +162,10 @@ public class GUI extends JFrame{
                          
                          scrollPane3.setViewportView(outerPanel);
                          scrollPane3.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                         scrollPane3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//                         scrollPane3.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                          
                          outerPanel = new JPanel();
-                         outerPanel.setLayout(new FlowLayout());
+                         outerPanel.setLayout(new BoxLayout(outerPanel, BoxLayout.Y_AXIS));
                          for(int i=0; i<v.gradualKeyframes.size(); i++){
                              int keyframe = v.gradualKeyframes.get(i);
                              JPanel p = new JPanel();
@@ -186,7 +181,7 @@ public class GUI extends JFrame{
                          
                          scrollPane4.setViewportView(outerPanel);
                          scrollPane4.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-                         scrollPane4.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+//                         scrollPane4.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
                     
                          repaint();
          				 revalidate();
@@ -209,39 +204,39 @@ public class GUI extends JFrame{
 		panelInput.add(lblStatus);
 		
 		scrollPane1 = new JScrollPane();
-		scrollPane1.setBounds(10, 103, 324, 205);
+		scrollPane1.setBounds(10, 103, 400, 205);
 		getContentPane().add(scrollPane1);
 		
 		scrollPane3 = new JScrollPane();
-		scrollPane3.setBounds(10, 335, 324, 205);
+		scrollPane3.setBounds(10, 335, 400, 205);
 		getContentPane().add(scrollPane3);
 		
 		scrollPane2 = new JScrollPane();
-		scrollPane2.setBounds(341, 103, 324, 205);
+		scrollPane2.setBounds(450, 103, 400, 205);
 		getContentPane().add(scrollPane2);
 		
 		scrollPane4 = new JScrollPane();
-		scrollPane4.setBounds(341, 335, 324, 205);
+		scrollPane4.setBounds(450, 335, 400, 205);
 		getContentPane().add(scrollPane4);
 		
 		JLabel lblNewLabel = new JLabel("Abrupt Transitions");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel.setBounds(102, 85, 131, 14);
+		lblNewLabel.setBounds(150, 85, 131, 14);
 		getContentPane().add(lblNewLabel);
 		
 		JLabel lblAbruptTransitionsW = new JLabel("Abrupt Transitions w/ Keyframes");
 		lblAbruptTransitionsW.setHorizontalAlignment(SwingConstants.CENTER);
-		lblAbruptTransitionsW.setBounds(388, 85, 241, 14);
+		lblAbruptTransitionsW.setBounds(520, 85, 241, 14);
 		getContentPane().add(lblAbruptTransitionsW);
 		
 		JLabel lblGradualTransitionsW = new JLabel("Gradual Transitions w/ Keyframes");
 		lblGradualTransitionsW.setHorizontalAlignment(SwingConstants.CENTER);
-		lblGradualTransitionsW.setBounds(388, 319, 241, 14);
+		lblGradualTransitionsW.setBounds(520, 319, 241, 14);
 		getContentPane().add(lblGradualTransitionsW);
 		
 		JLabel lblGradualTransitions = new JLabel("Gradual Transitions");
 		lblGradualTransitions.setHorizontalAlignment(SwingConstants.CENTER);
-		lblGradualTransitions.setBounds(102, 319, 131, 14);
+		lblGradualTransitions.setBounds(150, 319, 131, 14);
 		getContentPane().add(lblGradualTransitions);
 		
 	}
